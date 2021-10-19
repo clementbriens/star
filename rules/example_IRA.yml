@@ -1,0 +1,21 @@
+title: Russian IRA tweets
+description: Detects tweets from the Russian Internet Research Agency
+author: @clementbriens
+
+detection:
+  strings:
+    - MAGA
+    - Trump
+  hashtags:
+   - MAGA
+   - ColumbiaChemicals
+   account_date:
+     - before 2014/01/01
+     - after 2011/01/01
+    followers:
+    - min 10
+    - max 5000
+    verified : False
+    default_profile_image : False
+
+  condition: all of strings and 1 of hashtags and all of account_date and all of verified and all of default_profile_image
