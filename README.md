@@ -26,8 +26,8 @@ detection:
     - MAGA
     - Trump
   hashtags:
-   - #MAGA
-   - #ColumbiaChemicals
+   - MAGA
+   - ColumbiaChemicals
    account_date:
      - before 2014/01/01
      - after 2011/01/01
@@ -38,4 +38,37 @@ detection:
     default_profile_image : False
 
   condition: all of strings and 1 of hashtags and all of account_date and all of verified and all of default_profile_image
+```
+
+## Usage
+
+`python star.py -r rule_path -i tweet_path -o output-path -f field1 field2`
+
+### Arguments:
+
+* `-r` / `--rule` : Path to the STAR rule to use to scan tweets
+
+* `-i` / `--input` : Path to the tweet data to scan using the STAR rule. Currently accepts JSON files.
+
+* `-o` / `--output` : Path and filename for the output. Currently accepted formats are JSON and CSV.
+
+* `-f` / `--fields` : Custom fields to be returned in the output.
+
+### Examples:
+
+`python star.py -r rules/wwg1wga.yml -i tweets.json -o results.csv`
+
+### Use STAR as a library
+
+Alternatively, you can import STAR directly into your script and use its functions.
+
+```
+from star import STAR
+import json
+
+rule = star.read_rule('rules/wwg1wga.yml')
+tweet = json.load(open('tweet.json'))
+
+hit = star.scan_tweet(tweet, rule)
+print(hit)
 ```
