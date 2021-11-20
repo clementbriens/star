@@ -6,13 +6,15 @@ from utils import detections
 import dateparser
 import argparse
 import pandas as pd
-
-
+import re
 
 class STAR():
     def __init__(self, args = None):
         print('Simple Twitter Analysis Rules.')
-        self.args = vars(args)
+        if args:
+            self.args = vars(args)
+        else:
+            self.args = None
 
     def check_rule(self, rule):
         try:
@@ -32,25 +34,23 @@ class STAR():
 
 
     def read_rule(self, path):
-        try:
-            with open(path, 'r') as stream:
-                rule = yaml.safe_load(stream)
-                check = self.check_rule(rule)
-                if check:
-                    print('Loaded {}.'.format(rule['title']))
-                    return rule
-                else:
-                    sys.exit()
-
-        except:
-            print('{} is not a valid STAR rule.'.format(path))
-            return None
+        # try:
+        with open(path, 'r') as stream:
+            rule = yaml.safe_load(stream)
+            check = self.check_rule(rule)
+            if check:
+                print('Loaded {}.'.format(rule['title']))
+                return rule
+            else:
+                sys.exit()
+        # except:
+        #     print('{} is not a valid STAR rule.'.format(path))
+        #     return None
 
     def scan_tweet(self, tweet, rule):
         # try:
         condition = ''
         categories = {}
-
         # go through each string category defined in detections.py
         # if the string category is in the rule, check whether the string is
         # in the tweet's field
@@ -108,6 +108,17 @@ class STAR():
                     categories[cat][bool] = True
                 else:
                     categories[cat][bool] = False
+
+        for cat in detections.regex_categories:
+            if cat in rule['detection'].keys():
+                categories[cat] = {}
+                detection = detections.get_regex_cat_detection(cat, tweet)
+                for regex in rule['detection'][cat]:
+                    if re.findall(regex, detection):
+                        categories[cat][regex] = True
+                    else:
+                        categories[cat][regex] = False
+
 
         # understand the defined logic in the conditions string
         if rule['detection']['condition']:
@@ -196,15 +207,16 @@ class STAR():
                             for key in categories[condition['category']].keys():
                                 if categories[condition['category']][key]:
                                     # print(condition['category'], ':', key)
-                                    matches.append({'category' : condition['category'], 'string' : key})
+                                    matches.append({'category' : condition['category'], 'detection' : key})
         # else:
             # print('No match found.')
         hit ={'hit' : end_condition_bool, 'matches' : matches}
-        for field in self.args['fields']:
-            if field in tweet['user'].keys():
-                hit[field] = tweet['user'][field]
-            else:
-                hit[field] = tweet[field]
+        if self.args:
+            for field in self.args['fields']:
+                if field in tweet['user'].keys():
+                    hit[field] = tweet['user'][field]
+                else:
+                    hit[field] = tweet[field]
 
         return hit
         # except:
@@ -258,10 +270,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
-    star = STAR(args)
+    star = STAR()
     star.main()
-    # rule = star.read_rule('rules/wwg1wga.yml')
-    # if rule:
-    #     hit =  star.scan_tweet(tweet, rule)
-    #     print(hit)

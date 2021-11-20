@@ -2,14 +2,15 @@ import dateparser
 from datetime import datetime
 
 string_categories = ['strings', 'mentions', 'urls', 'user_name', 'screen_name', 'hashtags', 'description']
-math_categories = ['date', 'account_date', 'account_followers', 'account_friends']
+math_categories = ['date', 'account_date', 'account_followers', 'account_friends', 'nb_mentions']
 bool_categories = ['verified', 'protected', 'geo_enabled', 'contributors_enabled',
 'is_translator', 'is_translation_enabled', 'profile_background_tile', 'profile_use_background_image',
 'has_extended_profile', 'default_profile', 'default_profile_image', 'profile_background_tile',
 'following', 'follow_request_sent', 'notifications', 'is_quote_status',
 'favorited', 'retweeted', 'possibly_sensitive', 'possibly_sensitive_appealable']
+regex_categories = ['re_' + x for x in string_categories]
 
-all_categories = string_categories + math_categories + bool_categories
+all_categories = string_categories + math_categories + bool_categories + regex_categories
 all_categories.append('condition')
 
 def get_string_cat_detection(cat, tweet):
@@ -42,6 +43,8 @@ def get_math_cat_detection(cat, tweet):
         detection = int(tweet['user']['followers_count'])
     elif cat == "account_friends":
         detection = int(tweet['user']['friends_count'])
+    elif cat == "nb_mentions":
+        detection = len([x['screen_name'] for x in tweet['entities']['user_mentions']])
     return detection
 
 def get_bool_cat_detection(cat, tweet):
@@ -49,3 +52,6 @@ def get_bool_cat_detection(cat, tweet):
         return tweet[cat]
     else:
         return tweet['user'][cat]
+
+def get_regex_cat_detection(cat, tweet):
+    return get_string_cat_detection(cat[3:], tweet)

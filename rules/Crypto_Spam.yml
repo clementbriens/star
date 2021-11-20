@@ -1,0 +1,11 @@
+title: Crypto Spam Follow Trains
+rule_date : 2021/11/20
+rule_author : Clement Briens
+detection:
+  re_strings:
+    - "[$][A-Z]{2}[\\S]"
+  account_date:
+    - after 2021/01/01
+  nb_mentions:
+    - min 10
+  condition: all of re_strings all of account_date and all of nb_mentions
