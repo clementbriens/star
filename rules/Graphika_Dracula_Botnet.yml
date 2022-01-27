@@ -1,0 +1,17 @@
+title: Dracula's Botnet Test
+reference : https://graphika.com/posts/draculas-botnet/
+reference_date : 2020/08/26
+reference_author : Ben Nimmo
+rule_date : 2021/11/20
+rule_author : Clement Briens
+detection:
+  re_strings:
+    - "[a-zA-Z]*[^\\s-]\\+[^\\s-][a-zA-Z]*"
+  re_screen_name:
+    - "[a-zA-Z]*[0-9]{8}"
+  nb_mentions:
+    - min 10
+  account_date:
+    - before 2020/09/01
+    - after 2020/01/01
+  condition: all of re_strings and all of re_screen_name and all of nb_mentions and all of account_date
