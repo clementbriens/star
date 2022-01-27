@@ -1,0 +1,13 @@
+title: Recent Accounts Ukraine
+description: Find accounts created in 2022 tweeting about Ukraine/Russia.
+author: clementbriens
+detection:
+  account_followers:
+  - max 1000
+  strings:
+  - Ukraine
+  - Russia
+  - NATO
+  account_date:
+    - after 2022/01/01
+  condition: all of account_followers and 2 of strings and all of account_date

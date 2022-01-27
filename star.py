@@ -1,7 +1,6 @@
 import sys
 import yaml
 import json
-from tweet import tweet
 from utils import detections
 import dateparser
 import argparse
@@ -25,10 +24,10 @@ class STAR():
         if condition:
             for key in rule['detection'].keys():
                 if key not in detections.all_categories:
-                    print('{} is not a recognized category.'.format(key))
+                    print('{}: {} is not a recognized category.'.format(rule['title'], key))
                     return False
                 if key not in condition and key != 'condition':
-                    print('{} is not included in condition logic. Please revise rule.'.format(key))
+                    print('{}: {} is not included in condition logic. Please revise rule.'.format(rule['title'], key))
                     return False
         return True
 
@@ -39,7 +38,7 @@ class STAR():
             rule = yaml.safe_load(stream)
             check = self.check_rule(rule)
             if check:
-                print('Loaded {}.'.format(rule['title']))
+                print('- Loaded {}.'.format(rule['title']))
                 return rule
             else:
                 sys.exit()
@@ -59,8 +58,11 @@ class STAR():
                 categories[cat] = {}
                 detection = detections.get_string_cat_detection(cat, tweet)
                 for string in rule['detection'][cat]:
-                    if string in detection:
-                        categories[cat][string] = True
+                    if detection:
+                        if string in detection:
+                            categories[cat][string] = True
+                        else:
+                            categories[cat][string] = False
                     else:
                         categories[cat][string] = False
 
@@ -118,7 +120,6 @@ class STAR():
                         categories[cat][regex] = True
                     else:
                         categories[cat][regex] = False
-
 
         # understand the defined logic in the conditions string
         if rule['detection']['condition']:
