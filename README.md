@@ -40,6 +40,8 @@ detection:
   condition: all of strings and 1 of hashtags and all of account_date and all of verified and all of default_profile_image
 ```
 
+Full documentation of these terms will be provided in the future.
+
 ## Usage
 
 `python star.py -r rule_path -i tweet_path -o output-path -f field1 field2`
@@ -58,7 +60,7 @@ detection:
 
 `python star.py -r rules/wwg1wga.yml -i tweets.json -o results.csv`
 
-### Use STAR as a library
+## Use STAR as a library
 
 Alternatively, you can import STAR directly into your script and use its functions.
 
@@ -72,3 +74,39 @@ tweet = json.load(open('tweet.json'))
 hit = star.scan_tweet(tweet, rule)
 print(hit)
 ```
+
+## Using STAR to scan Tweets in real time
+
+You can also use STAR to scan Tweets from the Twitter Stream API in real time.
+
+### Configuration
+
+Copy the `config.ini.sample` to a new `config.ini` file and fill in the fields with your Twitter API creds.
+
+`cp config.ini.sample config.ini`
+
+### Usage
+
+To scan english-language Tweets from the Sampling API:
+
+`python star_stream.py -m sample -l en -o json -p ./hits -r ./rules -v`
+
+To scan Tweets mentioning specific keywords/terms:
+
+`python star_stream.py -m filter -t Biden Trump -o json -p ./hits/us_hits -r ./rules/us_rules -v`
+
+### Arguments
+
+* `-m` / `--mode` : Select the streaming mode according to Twitter's API docs. Can be set to `sample` or `filter`
+
+* `-l` / `--lang` : Language for stream sampling. Uses ISO-Alpha-2 country codes.
+
+* `-t` / `--terms` : Keywords/terms for stream filtering.
+
+* `-o` / `--output` : Output format. Defaults to `json`.
+
+* `-p` / `--path` : Path for output.
+
+* `-r` / `--rules` : Path for rules to scan. You can specify a specific folder with rules based on your analysis.
+
+* `-v` / `--verbose` : Whether to output Tweet information for each hit to the CLI.
