@@ -57,7 +57,8 @@ def load_all_rules(rule_path):
     else:
         rule_path = './rules/'
     for rule in os.listdir(rule_path):
-        rules.append(star.read_rule(rule_path + rule))
+        if rule.endswith('.yml'):
+            rules.append(star.read_rule(rule_path + rule))
     return rules
 
 def process_tweets(tweets_queue, rules, output, output_path, verbose, es, index, star_es):
