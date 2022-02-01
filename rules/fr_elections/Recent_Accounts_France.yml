@@ -1,0 +1,16 @@
+title: Recent Accounts France
+description: Find accounts created in 2022 tweeting about French elections.
+author: clementbriens
+detection:
+  account_followers:
+  - max 1000
+  strings:
+  - Macron
+  - Zemmour
+  - Le Pen
+  - Pecresse
+  - Elections
+  - France
+  account_date:
+    - after 2022/01/01
+  condition: all of account_followers and 2 of strings and all of account_date

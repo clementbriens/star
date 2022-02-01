@@ -1,5 +1,11 @@
 [twitter]
-api_key = 
+api_key =
 api_secret =
 bearer_token =
 access_secret =
+
+[es]
+es_cloud_id = 
+es_cloud_user =
+es_cloud_pass =
+es_cloud_port =

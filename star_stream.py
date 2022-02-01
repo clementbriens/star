@@ -22,7 +22,8 @@ class TwitterStream(TwythonStreamer):
             self.tweet_queue.put(data)
 
     def on_error(self, status_code, data, headers):
-        print(status_code)
+        if status_code == 420:
+            print('[!] Twitter API is throttling attempts to reopen a stream- please wait several minutes and try again.')
         self.disconnect()
         sys.exit()
 
@@ -42,6 +43,7 @@ def stream_tweets(tweets_queue, mode, lang = None, keywords = None):
             stream.statuses.filter(track = keywords)
         else:
             print('[!] No streaming mode specified.')
+            sys.exit()
 
     except ChunkedEncodingError:
         stream_tweets(tweet_queue)
@@ -58,7 +60,7 @@ def load_all_rules(rule_path):
         rules.append(star.read_rule(rule_path + rule))
     return rules
 
-def process_tweets(tweets_queue, rules, output, output_path, verbose):
+def process_tweets(tweets_queue, rules, output, output_path, verbose, es, index, star_es):
     while True:
         tweet = tweets_queue.get()
         # Do something with the tweet
@@ -66,7 +68,7 @@ def process_tweets(tweets_queue, rules, output, output_path, verbose):
         for rule in rules:
             hit = star.scan_tweet(tweet, rule)
             if hit['hit']:
-                print(Fore.GREEN + 'Hit on ' + Fore.RED + rule['title'] + Fore.GREEN + ': {}\n'.format(tweet['id']))
+                print(Fore.GREEN + 'Hit on ' + Fore.RED + rule['title'] + Fore.GREEN + ': {}'.format(tweet['id']))
                 if verbose:
                     print(Fore.YELLOW + '\tHandle:', tweet['user']['screen_name'])
                     print(Fore.YELLOW + '\tFollowers:', tweet['user']['followers_count'])
@@ -75,24 +77,45 @@ def process_tweets(tweets_queue, rules, output, output_path, verbose):
                 print(Style.RESET_ALL)
                 hit['rule'] = rule['title']
                 tweet['star_hit'] = hit
+                for key in hit.keys():
+                    tweet['star_hit.{}'.format(key)] = hit[key]
+                for key in tweet['user'].keys():
+                    tweet['user.{}'.format(key)] = tweet['user'][key]
                 if output == 'json':
                     try:
                         filename = '{}/{}.json'.format(output_path, tweet['id'])
                         with open(filename, 'w') as f:
                             json.dump(tweet, f)
                             if verbose:
-                                print('\n\tSaved tweet to {}\n'.format(filename))
+                                print('\tSaved tweet to {}\n'.format(filename))
                     except:
-                        print('[!] Could not save Tweet.\n')
+                        if verbose:
+                            print('\tCould not save tweet.\n')
+                        pass
+                elif output == 'es':
+                    es.index(index, id = tweet['id'], body = star_es.parse_tweet(tweet))
+                    if verbose:
+                        print('\tSaved tweet to ES.\n')
+
         tweets_queue.task_done()
 
-def run(mode, lang = None, terms = None, output = None, output_path = None, rules_path = None, verbose = None):
+def run(mode, lang = None, terms = None, output = None, output_path = None, rules_path = None, verbose = None, index = None):
+    es = None
+    if output == 'es':
+        from star_es import STAR_ES
+        star_es = STAR_ES()
+    es = star_es.load_es()
+
+
     rules = load_all_rules(rules_path)
     print('All STAR rules ({}) loaded.'.format(len(rules)))
     print('Starting tweet collection...\n')
     tweet_queue = Queue()
     Thread(target=stream_tweets, args=(tweet_queue, mode, lang, terms), daemon=True).start()
-    process_tweets(tweet_queue, rules, output, output_path, verbose)
+    if es:
+        process_tweets(tweet_queue, rules, output, output_path, verbose, es, index, star_es)
+    else:
+        process_tweets(tweet_queue, rules, output, output_path, verbose, None, None)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -104,6 +127,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--path', default = None, help = 'Output path for scan results. json')
     parser.add_argument('-r', '--rules', default = None, help = 'Path for STAR rules to scan for.')
     parser.add_argument('-v', '--verbose', default = False, action='store_true', help = 'Verbosity level in CLI output.')
+    parser.add_argument('-i', '--index', default = None, help = 'Elasticsearch index for results.')
 
     args = vars(parser.parse_args())
     run(mode = args['mode'],
@@ -112,5 +136,6 @@ if __name__ == '__main__':
     output = args['output'],
     output_path = args['path'],
     rules_path = args['rules'],
-    verbose = args['verbose'])
+    verbose = args['verbose'],
+    index = args['index'])
     #run(mode = 'sample', lang = 'en', terms = [], output = 'json', output_path = 'hits', verbose = True)
