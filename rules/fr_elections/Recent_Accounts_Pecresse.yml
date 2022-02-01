@@ -1,0 +1,16 @@
+title: Recent Accounts Pecresse
+description: Find accounts created in 2022 tweeting about Pecresse's campaign.
+author: clementbriens
+detection:
+  strings:
+  - Valérie Pécresse
+  - Valerie Pecresse
+  - Pecresse
+  - valeriepecresse.fr
+  - Les Républicains
+  - Les Republicains
+  - Gérard Larcher
+  - Laurent Wauquiez
+  account_date:
+    - after 2022/01/01
+  condition: 2 of strings and all of account_date

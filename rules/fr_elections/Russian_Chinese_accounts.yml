@@ -1,0 +1,8 @@
+title: Russian and Chinese language tweets
+description: Finds tweets in russian and chinese.
+author: clementbriens
+detection:
+  lang:
+    - ru
+    - zh
+  condition: 1 of lang

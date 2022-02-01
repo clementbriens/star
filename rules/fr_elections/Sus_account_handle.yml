@@ -1,0 +1,8 @@
+title: Suspicious accounts
+description: Find accounts with suspicious handles containing a series of numbers (e.g. John123456) and default profile picture
+author: clementbriens
+detection:
+  re_screen_name:
+    - "[0-9]{2,8}"
+  default_profile_image : True
+  condition: all of re_screen_name and all of default_profile_image

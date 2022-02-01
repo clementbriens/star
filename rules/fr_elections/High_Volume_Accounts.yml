@@ -1,0 +1,9 @@
+title: High volume accounts
+description: Find accounts that have a high volume of tweets relative to their creation date
+author: clementbriens
+detection:
+  tweets_per_day:
+    - min 500
+  tweets_per_week:
+    - min 4000
+  condition: all of tweets_per_day or all of tweets_per_week
