@@ -31,6 +31,8 @@ class STAR_ES():
         for key in tweet.keys():
             if key in mapping:
                 data[key] = tweet[key]
+            if 'star_hit' in key:
+                data[key] = tweet[key]
         for key in tweet['user'].keys():
             if key in user_mapping:
                 data['user.{}'.format(key)] = tweet['user'][key]
@@ -43,6 +45,5 @@ class STAR_ES():
                 elif entity in ['user_mentions']:
                     data['entities'][entity].append(e['screen_name'])
         data['timestamp'] = datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
-        for key in tweet['star_hit']:
-            data[key] = tweet['star_hit'][key]
+        data['user.created_at'] =  datetime.strptime(data['user.created_at'],'%a %b %d %H:%M:%S +0000 %Y')
         return data

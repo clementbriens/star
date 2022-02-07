@@ -1,13 +1,17 @@
 import dateparser
 from datetime import datetime, date
 
-string_categories = ['strings', 'mentions', 'urls', 'user_name', 'screen_name', 'hashtags', 'description', 'lang']
-math_categories = ['date', 'account_date', 'account_followers', 'account_friends', 'nb_mentions', 'nb_tweets', 'tweets_per_day', 'tweets_per_week']
+string_categories = ['strings', 'mentions', 'urls', 'user_name', 'screen_name',
+'hashtags', 'description', 'lang']
+math_categories = ['date', 'account_date', 'account_followers', 'account_friends',
+'nb_mentions', 'nb_tweets', 'tweets_per_day', 'tweets_per_week', 'sentiment_compound',
+'sentiment_negative', 'sentiment_neutral', 'sentiment_positive']
 bool_categories = ['verified', 'protected', 'geo_enabled', 'contributors_enabled',
 'is_translator', 'is_translation_enabled', 'profile_background_tile', 'profile_use_background_image',
 'has_extended_profile', 'default_profile', 'default_profile_image', 'profile_background_tile',
 'following', 'follow_request_sent', 'notifications', 'is_quote_status',
 'favorited', 'retweeted', 'possibly_sensitive', 'possibly_sensitive_appealable']
+metric_categories = []
 regex_categories = ['re_' + x for x in string_categories]
 
 all_categories = string_categories + math_categories + bool_categories + regex_categories
@@ -35,7 +39,8 @@ def get_string_cat_detection(cat, tweet):
         detection = None
     return detection
 
-def get_math_cat_detection(cat, tweet):
+def get_math_cat_detection(cat, tweet, sent = None):
+
     if cat == 'date':
         # detection = dateparser.parse(tweet['created_at'])
         detection = datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
@@ -65,8 +70,8 @@ def get_math_cat_detection(cat, tweet):
         #in case account was created this week
         except:
             detection = int(tweet['user']['statuses_count'])
-
-
+    elif 'sentiment' in cat:
+        detection = float(sent[cat])
     return detection
 
 def get_bool_cat_detection(cat, tweet):
