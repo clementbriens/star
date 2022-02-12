@@ -44,6 +44,8 @@ class STAR_ES():
                     data['entities'][entity].append(e['text'])
                 elif entity in ['user_mentions']:
                     data['entities'][entity].append(e['screen_name'])
+                elif entity in ['urls', 'symbols']:
+                    data['entities'][entity].append(e)
         data['timestamp'] = datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
         data['user.created_at'] =  datetime.strptime(data['user.created_at'],'%a %b %d %H:%M:%S +0000 %Y')
         return data
