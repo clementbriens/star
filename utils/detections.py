@@ -11,7 +11,6 @@ bool_categories = ['verified', 'protected', 'geo_enabled', 'contributors_enabled
 'has_extended_profile', 'default_profile', 'default_profile_image', 'profile_background_tile',
 'following', 'follow_request_sent', 'notifications', 'is_quote_status',
 'favorited', 'retweeted', 'possibly_sensitive', 'possibly_sensitive_appealable']
-metric_categories = []
 regex_categories = ['re_' + x for x in string_categories]
 
 all_categories = string_categories + math_categories + bool_categories + regex_categories

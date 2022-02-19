@@ -40,7 +40,89 @@ detection:
   condition: all of strings and 1 of hashtags and all of account_date and all of verified and all of default_profile_image
 ```
 
-Full documentation of these terms will be provided in the future.
+### Detections
+
+The following detections are available for building STAR rules. All of these detections are specified in the `utils/detections.py` file. All detections must appear under the `detection:` section of the file.
+
+#### Strings
+
+- `strings` : matches strings in the Tweet text
+- `mentions` : matches mentioned users
+- `urls` : matches URLs included in the tweet
+- `user_name` : matches Tweet authors' username
+- `screen_name` : matches Tweet authors'screen name
+- `hashtags` : matches Tweet hashtags
+- `description` : matches Tweet authors' account descriptions
+- `lang` : matches Tweet language
+
+You can also use Regex patterns surrounded by quotes on any of these fields by appending `re_` in front of these detections. For example, to use a regex pattern on usernames, you can use:
+
+```
+re_screen_name:
+  - "[a-zA-Z]*[0-9]{8}"
+
+```
+
+#### Math
+
+- `date` : Tweet date (YYYY/MM/DD)
+- `account_date` : Author's account creation date (YYYY/MM/DD)
+- `account_followers` : Number of author's followers
+- `account_friends` : Number of author's friends
+- `nb_mentions` : Number of users mentioned in tweets
+- `tweets_per_day` : Average number of tweets per day by the author
+- `tweets_per_week` : Average number of tweets per week by the author
+- `sentiment_compound` : Overall tweet sentiment, between `-1` and `1`.
+- `sentiment_negative` : Negative sentiment score, between `0` and `1`
+- `sentiment_neutral` : Neutral sentiment score, between `0` and `1`
+- `sentiment_positive` : Positive sentiment score, between `0` and `1`
+
+In addition to specifying specific dates or numbers, you can also use ranges using `min`, `max`, `after` or `before`. Please refer to the following examples:
+
+```
+account_followers:
+  - min 1000
+  - max 5000
+account_date:
+  - before 2022/03/01
+  - after 2022/01/01
+```
+
+#### Booleans
+
+You can specify either `True` of `False` for each of these:
+
+- `verified`
+- `protected`
+- `geo_enabled`
+- `contributors_enabled`
+- `is_translator`
+- `is_translation_enabled`
+- `profile_background_tile`
+- `profile_use_background_image`
+- `has_extended_profile`
+- `default_profile`
+- `default_profile_image`
+- `profile_background_tile`
+- `following`
+- `follow_request_sent`
+- `notifications`
+- `is_quote_status`
+- `favorited`
+- `retweeted`
+- `possibly_sensitive`
+- `possibly_sensitive_appealable`
+
+### Condition logic
+
+Any detection added to the rule must be included in the condition logic. You can use the following booleans to build you condition:
+
+- `all of strings` to detect if all `strings` match
+- `3 of strings` to detect if 3 of the specified `strings` match
+- `none of strings` to detect if none of the specified `strings` match
+- `and`
+- `or`
+
 
 ## Usage
 
