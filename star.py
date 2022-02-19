@@ -295,5 +295,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    star = STAR({'sentiment' : True, 'input' : 'hits/1486730163127607313.json', 'rule' : 'rules/test/test_sent.yml'})
+    star = STAR()
     star.main()
