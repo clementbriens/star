@@ -123,6 +123,19 @@ Any detection added to the rule must be included in the condition logic. You can
 - `and`
 - `or`
 
+## Installation
+
+`git clone https://github.com/clementbriens/star`
+
+`cd star`
+
+`virtualenv env -p python3 && source env/bin/activate`
+
+`pip install -r requirements.txt`
+
+`mv config.ini.sample config.ini`
+
+You then need to add your Twitter API credentials to `config.ini`. You can also specify your Elasticsearch cluster creds.
 
 ## Usage
 
@@ -134,7 +147,7 @@ Any detection added to the rule must be included in the condition logic. You can
 
 * `-i` / `--input` : Path to the tweet data to scan using the STAR rule. Currently accepts JSON files.
 
-* `-o` / `--output` : Path and filename for the output. Currently accepted formats are JSON and CSV.
+* `-o` / `--output` : Path and filename for the output. Currently accepted formats are `json`, `csv`.
 
 * `-f` / `--fields` : Custom fields to be returned in the output.
 
@@ -185,7 +198,9 @@ To scan Tweets mentioning specific keywords/terms:
 
 * `-t` / `--terms` : Keywords/terms for stream filtering.
 
-* `-o` / `--output` : Output format. Defaults to `json`.
+* `-o` / `--output` : Output format. Defaults to `json`. You can also specify `es` for direct output to Elasticsearch.
+
+* `-i` / `--index` : Elasticsearch index to output to.
 
 * `-p` / `--path` : Path for output.
 
