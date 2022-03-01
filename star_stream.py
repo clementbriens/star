@@ -71,6 +71,8 @@ def process_tweets(tweets_queue, rules, output, output_path, verbose, es, index,
         tweet = tweets_queue.get()
         # Do something with the tweet
         #print(tweet)
+        tweet['star'] = list()
+        hits = list()
         for rule in rules:
             hit = star.scan_tweet(tweet, rule)
             if hit['hit']:
@@ -82,30 +84,39 @@ def process_tweets(tweets_queue, rules, output, output_path, verbose, es, index,
                     print(Fore.GREEN + '\t' + tweet['text'])
                 print(Style.RESET_ALL)
                 hit['rule'] = rule['title']
-                if 'sentiment_data' in hit.keys():
-                    hit['sentiment_data'] = hit['sentiment_data']
-                tweet['star_hit'] = hit
-                for key in hit.keys():
-                    tweet['star_hit.{}'.format(key)] = hit[key]
-                for key in tweet['user'].keys():
-                    tweet['user.{}'.format(key)] = tweet['user'][key]
-                if output == 'json':
-                    try:
-                        filename = '{}/{}.json'.format(output_path, tweet['id'])
-                        with open(filename, 'w') as f:
-                            json.dump(tweet, f)
-                            if verbose:
-                                print('\tSaved tweet to {}\n'.format(filename))
-                    except:
+
+                tweet['star'].append(hit)
+                hits.append(hit)
+        tweet['star_rules'] = [h['rule'] for h in hits]
+        tweet['star_nb_hits'] = len(hits)
+
+        if tweet['star_nb_hits'] > 0:
+            if 'sentiment_data' in hit.keys():
+                hit['sentiment_data'] = hit['sentiment_data']
+
+
+            for key in tweet['user'].keys():
+                tweet['user.{}'.format(key)] = tweet['user'][key]
+
+            if output == 'json':
+                try:
+                    filename = '{}/{}.json'.format(output_path, tweet['id'])
+                    with open(filename, 'w') as f:
+                        json.dump(tweet, f)
                         if verbose:
-                            print('\tCould not save tweet.\n')
-                        pass
-                elif output == 'es':
-                    es.index(index, id = tweet['id'], body = star_es.parse_tweet(tweet))
+                            print('\tSaved tweet to {}\n'.format(filename))
+                except:
                     if verbose:
-                        print('\tSaved tweet to ES.\n')
+                        print('\tCould not save tweet.\n')
+                    pass
+            elif output == 'es':
+                es.index(index, id = tweet['id'], body = star_es.parse_tweet(tweet))
+                if verbose:
+                    print('\tSaved tweet to ES.\n')
 
         tweets_queue.task_done()
+        if tweets_queue.qsize() > 5000:
+            tweet_queue = Queue()
 
 def run(mode, lang = None, terms = None, output = None, output_path = None, rules_path = None, verbose = None, index = None, sentiment = None):
     es = None

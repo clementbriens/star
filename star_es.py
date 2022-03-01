@@ -31,7 +31,7 @@ class STAR_ES():
         for key in tweet.keys():
             if key in mapping:
                 data[key] = tweet[key]
-            if 'star_hit' in key:
+            if 'star' in key:
                 data[key] = tweet[key]
         for key in tweet['user'].keys():
             if key in user_mapping:
