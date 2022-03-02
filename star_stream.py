@@ -46,7 +46,7 @@ def stream_tweets(tweets_queue, mode, lang = None, keywords = None):
             sys.exit()
 
     except ChunkedEncodingError:
-        stream_tweets(tweets_queue)
+        stream_tweets(tweets_queue, mode = mode, lang = lang, keywords = keywords)
 
 def load_all_rules(rule_path, star):
     rules = list()
