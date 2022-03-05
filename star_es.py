@@ -38,8 +38,8 @@ class STAR_ES():
                 data['user.{}'.format(key)] = tweet['user'][key]
         data['entities'] = dict()
         for entity in ["urls", "user_mentions", "symbols", "hashtags"]:
+            data['entities'][entity] = list()
             for e in tweet['entities'][entity]:
-                data['entities'][entity] = list()
                 if entity in ['hashtags']:
                     data['entities'][entity].append(e['text'])
                 elif entity in ['user_mentions']:
