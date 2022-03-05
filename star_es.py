@@ -31,15 +31,15 @@ class STAR_ES():
         for key in tweet.keys():
             if key in mapping:
                 data[key] = tweet[key]
-            if 'star_hit' in key:
+            if 'star' in key:
                 data[key] = tweet[key]
         for key in tweet['user'].keys():
             if key in user_mapping:
                 data['user.{}'.format(key)] = tweet['user'][key]
         data['entities'] = dict()
         for entity in ["urls", "user_mentions", "symbols", "hashtags"]:
+            data['entities'][entity] = list()
             for e in tweet['entities'][entity]:
-                data['entities'][entity] = list()
                 if entity in ['hashtags']:
                     data['entities'][entity].append(e['text'])
                 elif entity in ['user_mentions']:

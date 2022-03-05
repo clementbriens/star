@@ -2,10 +2,10 @@ import dateparser
 from datetime import datetime, date
 
 string_categories = ['strings', 'mentions', 'urls', 'user_name', 'screen_name',
-'hashtags', 'description', 'lang']
+'hashtags', 'description', 'lang', 'source', 'location']
 math_categories = ['date', 'account_date', 'account_followers', 'account_friends',
 'nb_mentions', 'nb_tweets', 'tweets_per_day', 'tweets_per_week', 'sentiment_compound',
-'sentiment_negative', 'sentiment_neutral', 'sentiment_positive']
+'sentiment_negative', 'sentiment_neutral', 'sentiment_positive', 'favourites_count', 'statuses_count', 'utc_offset' ]
 bool_categories = ['verified', 'protected', 'geo_enabled', 'contributors_enabled',
 'is_translator', 'is_translation_enabled', 'profile_background_tile', 'profile_use_background_image',
 'has_extended_profile', 'default_profile', 'default_profile_image', 'profile_background_tile',
@@ -33,6 +33,10 @@ def get_string_cat_detection(cat, tweet):
         detection = tweet['user']['description']
     elif cat == 'lang':
         detection = tweet['user']['lang']
+    elif cat == 'source':
+        detection = tweet['source']
+    elif cat == 'location':
+        detection = tweet['user']['location']
     else:
         print('Error: category "{}" not recognized.'.format(cat))
         detection = None
@@ -53,6 +57,12 @@ def get_math_cat_detection(cat, tweet, sent = None):
         detection = len([x['screen_name'] for x in tweet['entities']['user_mentions']])
     elif cat == "nb_tweets":
         detection = int(tweet['user']['statuses_count'])
+    elif cat == "favourites_count":
+        detection = int(tweet['user']['favourites_count'])
+    elif cat == "statuses_count":
+        detection = int(tweet['user']['statuses_count'])
+    elif cat == "utc_offset":
+        detection = round(int(tweet['user']['utc_offset']) / 3600, 0)
     elif cat == "tweets_per_day":
         now = datetime.today()
         create_date = datetime.strptime(tweet['user']['created_at'],'%a %b %d %H:%M:%S +0000 %Y')

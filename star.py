@@ -6,6 +6,7 @@ import dateparser
 import argparse
 import pandas as pd
 import re
+import os
 
 class STAR():
 
@@ -248,8 +249,13 @@ class STAR():
         pass
 
     def main(self):
-        if self.args['rule']:
-            rule = self.read_rule(self.args['rule'])
+        rules = list()
+        if self.args['rule'].endswith('.yml'):
+            rules.append(self.read_rule(self.args['rule']))
+        elif self.args['rule'].endswith('/'):
+            for rule in os.listdir(self.args['rule']):
+                if rule.endswith('.yml'):
+                    rules.append(self.read_rule(self.args['rule'] + rule))
         if self.args['input']:
             if self.args['input'].endswith('json'):
                 try:
@@ -268,11 +274,12 @@ class STAR():
         y = 0
         for tweet in tweets:
             print('{}/{} tweets scanned | {} hits'.format(x, len(tweets), y), end = '\r')
-            hit = self.scan_tweet(tweet, rule)
-            print(hit)
-            if hit['hit']:
-                y += 1
-                output_data.append(hit)
+            for rule in rules:
+                hit = self.scan_tweet(tweet, rule)
+                print(hit)
+                if hit['hit']:
+                    y += 1
+                    output_data.append(hit)
 
             x += 1
         if 'output' in self.args.keys():
@@ -290,10 +297,11 @@ if __name__ == '__main__':
                         help='STAR Rules to use for scanning a tweet')
     parser.add_argument('-i', '--input', metavar='i', help="Input for tweet")
     parser.add_argument('-o', '--output', metavar='o', help='Output for scan results')
-    parser.add_argument('-f', '--fields', metavar='f', nargs = '+', help='Fields to be returned in the scan results')
+    parser.add_argument('-f', '--fields', default = [], metavar='f', nargs = '+', help='Fields to be returned in the scan results')
     parser.add_argument('-s', '--sentiment', default = False, action = 'store_true')
 
     args = parser.parse_args()
+    print(args)
 
-    star = STAR({'sentiment' : True, 'input' : 'hits/1486730163127607313.json', 'rule' : 'rules/test/test_sent.yml'})
+    star = STAR(args)
     star.main()
