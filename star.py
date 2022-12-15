@@ -14,7 +14,6 @@ class STAR():
         print('[*] Simple Twitter Analysis Rules.')
         if type(args) == dict:
             self.args = args
-            print(args)
         elif args:
             self.args = vars(args)
         else:
@@ -58,6 +57,8 @@ class STAR():
         # try:
         condition = ''
         categories = {}
+        if self.args['debug']:
+            print('Rule:',rule)
         # go through each string category defined in detections.py
         # if the string category is in the rule, check whether the string is
         # in the tweet's field
@@ -170,13 +171,19 @@ class STAR():
 
         final_condition_bools = {}
         # print('final_condition_bools:', final_condition_bools)
+        if self.args['debug']:
+            print('Categories:', categories)
+            print('Conditions:', conditions)
         for condition in conditions:
+            if self.args['debug']:
+                print(condition['category'] in categories.keys())
             if condition['category'] in categories.keys():
                 nb_true = 0
                 for dict in categories[condition['category']].keys():
-
                     if categories[condition['category']][dict]:
                         nb_true += 1
+                if self.args['debug']:
+                    print('NB True:', nb_true)
 
                 final_condition_bools[condition['cid']] = {}
                 if condition['threshold'] == 'none' or condition['threshold'] == 0:
@@ -202,9 +209,15 @@ class STAR():
                         final_condition_bools[condition['cid']]['bool'] = False
 
         final_conditions = list()
-
+        if self.args['debug']:
+            print('Final condition bools:', final_condition_bools)
         for cb in condition_bools:
+            if self.args['debug']:
+                print(categories)
+                print(condition_bools)
             if cb['bool'] == 'same':
+                if self.args['debug']:
+                    print(final_condition_bools)
                 final_conditions.append(str(final_condition_bools[0]['bool']))
             else:
                 final_condition = "{} {} {}".format(final_condition_bools[cb['a']]['bool'], cb['bool'], final_condition_bools[cb['b']]['bool'])
@@ -244,9 +257,6 @@ class STAR():
         return hit
         # except:
         #     print('{} rule not formatted correctly.'.format(rule['title']))
-
-    def bulk_scan(self, path, rule):
-        pass
 
     def main(self):
         rules = list()
@@ -299,9 +309,8 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', metavar='o', help='Output for scan results')
     parser.add_argument('-f', '--fields', default = [], metavar='f', nargs = '+', help='Fields to be returned in the scan results')
     parser.add_argument('-s', '--sentiment', default = False, action = 'store_true')
-
+    parser.add_argument('-d', '--debug', default = False, action = 'store_true')
     args = parser.parse_args()
-    print(args)
 
     star = STAR(args)
     star.main()
